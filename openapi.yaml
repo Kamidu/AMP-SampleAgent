@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Birth Map Agent Demo API
+  version: 1.0.0
+  description: Minimal OpenAPI spec for the Birth Map Agent demo (health, sessions, run)
+servers:
+  - url: http://localhost:8000
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: getHealth
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /sessions:
+    post:
+      summary: Create a new session
+      operationId: createSession
+      responses:
+        '200':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCreateResponse'
+
+  /run:
+    post:
+      summary: Single-run endpoint that accepts all fields and returns the final state
+      operationId: runOnce
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionInputRequest'
+      responses:
+        '200':
+          description: Session state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStateResponse'
+
+  /sessions/{session_id}/input:
+    post:
+      summary: Submit input for an existing session
+      operationId: submitInput
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionInputRequest'
+      responses:
+        '200':
+          description: Session state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStateResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+  /sessions/{session_id}:
+    get:
+      summary: Get session state
+      operationId: getSession
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStateResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+components:
+  schemas:
+    SessionCreateResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        status:
+          type: string
+          enum: [collecting, ready, complete]
+        message:
+          type: string
+        missing_fields:
+          type: array
+          items:
+            type: string
+      required: [session_id, status, message, missing_fields]
+
+    SessionInputRequest:
+      type: object
+      properties:
+        birthdate:
+          type: string
+          nullable: true
+        birth_time:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+
+    SessionStateResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        status:
+          type: string
+          enum: [collecting, ready, complete]
+        birthdate:
+          type: string
+          nullable: true
+        birth_time:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        missing_fields:
+          type: array
+          items:
+            type: string
+        prompt:
+          type: string
+        result:
+          type: object
+          nullable: true
+      required: [session_id, status, missing_fields, prompt]
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        app:
+          type: string
+        environment:
+          type: string
+      required: [status, app, environment]
