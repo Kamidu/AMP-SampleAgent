@@ -1,0 +1,28 @@
+[project]
+name = "birth-map-agent-demo"
+version = "0.1.0"
+description = "Minimal session-based demo agent with multi-turn orchestration"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.1",
+    "httpx>=0.28.1",
+    "openai>=1.99.9",
+    "msal>=1.20.0",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "python-dotenv>=1.1.1",
+    "opentelemetry-api>=1.18.0",
+    "opentelemetry-sdk>=1.18.0",
+    "opentelemetry-exporter-otlp>=1.18.0",
+    "opentelemetry-instrumentation-fastapi>=0.36b0,<1.0.0",
+    "opentelemetry-instrumentation-httpx>=0.36b0,<1.0.0",
+    "uvicorn[standard]>=0.35.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
